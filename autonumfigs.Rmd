@@ -7,8 +7,8 @@ output:
     fig_caption: yes
     fig_height: 4
     fig_width: 4
-    smart: no
     self_contained: yes
+    smart: no
   pdf_document:
     fig_caption: yes
 ---
@@ -37,7 +37,7 @@ knit_hooks$set(source = function(x, options){
 
 This document illustrates how to add auto-numbered captions for figures and cross-references to a R Markdown document[^1]. However the functions shown below only work for generating HTML files. 
 
-The first thing to do is to copy-paste the following three code chunks into your Rmd document (normally you would set <tt>echo=FALSE</tt> or read them in using <tt>read_chunk()</tt> so these don't appear. For the Rmd file which created this document, click here.
+The first thing to do is to copy-paste the following three code chunks into your Rmd document (normally you would set <tt>echo=FALSE</tt> or read them in using <tt>read_chunk()</tt> so these don't appear. For the Rmd file which created this document, click [here](https://github.com/ajlyons/autonumfigs).
 
 [^1]: Based upon various work and posts:
 <ul><li>https://gist.github.com/benmarwick/f3e0cafe668f3d6ff6e5#file-captions_and_crossrefs-rmd</li><li>
