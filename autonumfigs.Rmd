@@ -37,7 +37,7 @@ knit_hooks$set(source = function(x, options){
 
 This document illustrates how to add auto-numbered captions for figures and cross-references to a R Markdown document[^1]. However the functions shown below only work for generating HTML files. 
 
-The first thing to do is to copy-paste the following three code chunks into your Rmd document (normally you would set <tt>echo=FALSE</tt> or read them in using <tt>read_chunk()</tt> so these don't appear. 
+The first thing to do is to copy-paste the following three code chunks into your Rmd document (normally you would set <tt>echo=FALSE</tt> or read them in using <tt>read_chunk()</tt> so these don't appear. For the Rmd file which created this document, click here.
 
 [^1]: Based upon various work and posts:
 <ul><li>https://gist.github.com/benmarwick/f3e0cafe668f3d6ff6e5#file-captions_and_crossrefs-rmd</li><li>
@@ -45,7 +45,9 @@ http://stackoverflow.com/questions/13848137/figure-captions-references-using-kni
 
 
 ```{r auto_num_functions, echo=TRUE}
+
 # A function for generating captions and cross-references
+
 fig <- local({
     i <- 0
     list(
@@ -86,6 +88,7 @@ fig <- local({
 ```
 
 ```{r setup, echo=TRUE}
+
 ## This chunk replaces the default hook for processing plots. It achieves the purposes,
 ## of laying out auto-numbered captions, but other functionality may be gone.
 
@@ -117,47 +120,48 @@ knit_hooks$set(plot = function(x, options) {
 ```
 
 ```{r read_fig_cap, echo=TRUE}
-    ## This chucnk will read through *this* Rmd file, and attempt to extract all of the 
-    ## labels (not caption text) used for Figure captions. These labels are used
-    ## as anchors, so scanning through the document now will allow us to create cross references
-    ## before the caption actually appears. 
-    
-    ## Get the name of this Rmd file
-    rmdFn <- knitr::current_input()  # filename of input document
 
-    ## Read lines and close connection
-    rmdCon <- file(rmdFn, open = "r")
-    rmdLines <- readLines(rmdCon)
-    close(rmdCon)
-    
-    ## Pull out all occurences of at least one back tick, followed 
-    ## by any number of characters, followed by fig$cap (all on one line)
-    figscap_idx <- grep("`+(.*)fig\\$cap", rmdLines)
-    rmdLines <- rmdLines[figscap_idx]
-    
-    ## Get rid of everything up until the start of the caption label
-    ## This presumes the caption label is the first argument of fig$cap()
-    ## E.g., fig.cap = fig$cap("my_label", ...)
-    rmdLinesSansPre <- sub("(.*)fig\\$cap(.*?)[\"']", "", rmdLines)
-    
-    ## Identify everything up until the first quote
-    match_data <- regexpr("(.*?)[\"']", rmdLinesSansPre)
-    
-    ## Reduce the length by one, because we're not interested in the final quote
-    attr(match_data, "match.length") <- attr(match_data, "match.length") - 1
-    
-    ## Extract
-    fig_labels <- regmatches(rmdLinesSansPre, match_data, invert=FALSE)
+## This chucnk will read through *this* Rmd file, and attempt to extract all of the 
+## labels (not caption text) used for Figure captions. These labels are used
+## as anchors, so scanning through the document now will allow us to create cross references
+## before the caption actually appears. 
 
-    if (length(fig_labels) > 0) {
+## Get the name of this Rmd file
+rmdFn <- knitr::current_input()  # filename of input document
 
-        ## Test for duplicates
-        if (anyDuplicated(fig_labels) > 0) stop("Duplicate caption labels detected")
-        
-        ## Create a named list of Figure numbers
-        ref <- as.list(1:length(fig_labels))
-        names(ref) <- fig_labels
-    }    
+## Read lines and close connection
+rmdCon <- file(rmdFn, open = "r")
+rmdLines <- readLines(rmdCon)
+close(rmdCon)
+
+## Pull out all occurences of at least one back tick, followed 
+## by any number of characters, followed by fig$cap (all on one line)
+figscap_idx <- grep("`+(.*)fig\\$cap", rmdLines)
+rmdLines <- rmdLines[figscap_idx]
+
+## Get rid of everything up until the start of the caption label
+## This presumes the caption label is the first argument of fig$cap()
+## E.g., fig.cap = fig$cap("my_label", ...)
+rmdLinesSansPre <- sub("(.*)fig\\$cap(.*?)[\"']", "", rmdLines)
+
+## Identify everything up until the first quote
+match_data <- regexpr("(.*?)[\"']", rmdLinesSansPre)
+
+## Reduce the length by one, because we're not interested in the final quote
+attr(match_data, "match.length") <- attr(match_data, "match.length") - 1
+
+## Extract
+fig_labels <- regmatches(rmdLinesSansPre, match_data, invert=FALSE)
+
+if (length(fig_labels) > 0) {
+
+    ## Test for duplicates
+    if (anyDuplicated(fig_labels) > 0) stop("Duplicate caption labels detected")
+    
+    ## Create a named list of Figure numbers
+    ref <- as.list(1:length(fig_labels))
+    names(ref) <- fig_labels
+}    
 ```
 
 The are two functions to use in your markdown document. These functions can be used either as a code chunk option or an inline R expressions (as shown below). 

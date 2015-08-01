@@ -76,6 +76,7 @@ pre:not([r]) {background-color:#F5F5F5;}
 <p>This document illustrates how to add auto-numbered captions for figures and cross-references to a R Markdown document<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. However the functions shown below only work for generating HTML files.</p>
 <p>The first thing to do is to copy-paste the following three code chunks into your Rmd document (normally you would set <tt>echo=FALSE</tt> or read them in using <tt>read_chunk()</tt> so these don't appear.</p>
 <pre class="r"><code># A function for generating captions and cross-references
+
 fig &lt;- local({
     i &lt;- 0
     list(
@@ -140,47 +141,47 @@ knit_hooks$set(plot = function(x, options) {
         sep = '')
     
 })</code></pre>
-<pre class="r"><code>    ## This chucnk will read through *this* Rmd file, and attempt to extract all of the 
-    ## labels (not caption text) used for Figure captions. These labels are used
-    ## as anchors, so scanning through the document now will allow us to create cross references
-    ## before the caption actually appears. 
-    
-    ## Get the name of this Rmd file
-    rmdFn &lt;- knitr::current_input()  # filename of input document
+<pre class="r"><code>## This chucnk will read through *this* Rmd file, and attempt to extract all of the 
+## labels (not caption text) used for Figure captions. These labels are used
+## as anchors, so scanning through the document now will allow us to create cross references
+## before the caption actually appears. 
 
-    ## Read lines and close connection
-    rmdCon &lt;- file(rmdFn, open = &quot;r&quot;)
-    rmdLines &lt;- readLines(rmdCon)
-    close(rmdCon)
-    
-    ## Pull out all occurences of at least one back tick, followed 
-    ## by any number of characters, followed by fig$cap (all on one line)
-    figscap_idx &lt;- grep(&quot;`+(.*)fig\\$cap&quot;, rmdLines)
-    rmdLines &lt;- rmdLines[figscap_idx]
-    
-    ## Get rid of everything up until the start of the caption label
-    ## This presumes the caption label is the first argument of fig$cap()
-    ## E.g., fig.cap = fig$cap(&quot;my_label&quot;, ...)
-    rmdLinesSansPre &lt;- sub(&quot;(.*)fig\\$cap(.*?)[\&quot;']&quot;, &quot;&quot;, rmdLines)
-    
-    ## Identify everything up until the first quote
-    match_data &lt;- regexpr(&quot;(.*?)[\&quot;']&quot;, rmdLinesSansPre)
-    
-    ## Reduce the length by one, because we're not interested in the final quote
-    attr(match_data, &quot;match.length&quot;) &lt;- attr(match_data, &quot;match.length&quot;) - 1
-    
-    ## Extract
-    fig_labels &lt;- regmatches(rmdLinesSansPre, match_data, invert=FALSE)
+## Get the name of this Rmd file
+rmdFn &lt;- knitr::current_input()  # filename of input document
 
-    if (length(fig_labels) &gt; 0) {
+## Read lines and close connection
+rmdCon &lt;- file(rmdFn, open = &quot;r&quot;)
+rmdLines &lt;- readLines(rmdCon)
+close(rmdCon)
 
-        ## Test for duplicates
-        if (anyDuplicated(fig_labels) &gt; 0) stop(&quot;Duplicate caption labels detected&quot;)
-        
-        ## Create a named list of Figure numbers
-        ref &lt;- as.list(1:length(fig_labels))
-        names(ref) &lt;- fig_labels
-    }    </code></pre>
+## Pull out all occurences of at least one back tick, followed 
+## by any number of characters, followed by fig$cap (all on one line)
+figscap_idx &lt;- grep(&quot;`+(.*)fig\\$cap&quot;, rmdLines)
+rmdLines &lt;- rmdLines[figscap_idx]
+
+## Get rid of everything up until the start of the caption label
+## This presumes the caption label is the first argument of fig$cap()
+## E.g., fig.cap = fig$cap(&quot;my_label&quot;, ...)
+rmdLinesSansPre &lt;- sub(&quot;(.*)fig\\$cap(.*?)[\&quot;']&quot;, &quot;&quot;, rmdLines)
+
+## Identify everything up until the first quote
+match_data &lt;- regexpr(&quot;(.*?)[\&quot;']&quot;, rmdLinesSansPre)
+
+## Reduce the length by one, because we're not interested in the final quote
+attr(match_data, &quot;match.length&quot;) &lt;- attr(match_data, &quot;match.length&quot;) - 1
+
+## Extract
+fig_labels &lt;- regmatches(rmdLinesSansPre, match_data, invert=FALSE)
+
+if (length(fig_labels) &gt; 0) {
+
+    ## Test for duplicates
+    if (anyDuplicated(fig_labels) &gt; 0) stop(&quot;Duplicate caption labels detected&quot;)
+    
+    ## Create a named list of Figure numbers
+    ref &lt;- as.list(1:length(fig_labels))
+    names(ref) &lt;- fig_labels
+}    </code></pre>
 <p>The are two functions to use in your markdown document. These functions can be used either as a code chunk option or an inline R expressions (as shown below).</p>
 <ul>
 <li><tt>fig$cap()</tt> - add a caption</li>
